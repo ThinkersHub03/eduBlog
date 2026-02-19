@@ -9,7 +9,7 @@ import { useState, useEffect } from "react"
 import { useRouter, useParams } from "next/navigation"
 import { FileUpload } from "@/components/file-upload"
 import { Switch } from "@/components/ui/switch"
-import { ArrowLeft, FileEdit, Sparkles, Globe, Image as ImageIcon, LayoutText } from "lucide-react"
+import { ArrowLeft, FileEdit, Sparkles, Globe, Image as ImageIcon, Layout } from "lucide-react"
 import Link from "next/link"
 
 export default function EditPostPage() {
@@ -132,7 +132,7 @@ export default function EditPostPage() {
 
                         <div className="space-y-4">
                             <label className="text-sm font-bold text-gray-700 ml-1 flex items-center gap-1.5">
-                                <LayoutText className="h-3.5 w-3.5 text-primary-600" />
+                                <Layout className="h-3.5 w-3.5 text-primary-600" />
                                 Article Body
                             </label>
                             <div className="p-1 rounded-3xl border border-gray-100 bg-gray-50/30 overflow-hidden min-h-[400px]">

@@ -12,7 +12,7 @@ interface DeleteButtonProps {
     id: string
     path: string
     /** Display name shown inside the confirmation modal */
-    title: string
+    title?: string
 }
 
 export function AdminDeleteButton({ table, id, path, title }: DeleteButtonProps) {
