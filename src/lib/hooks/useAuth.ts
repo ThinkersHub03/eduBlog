@@ -1,5 +1,5 @@
 import { useAppSelector, useAppDispatch } from '@/lib/redux/hooks'
-import { setUser, clearUser } from '@/lib/redux/slices/authSlice'
+import { setCredentials, logout as clearAuthState } from '@/lib/redux/slices/authSlice'
 import { createClient } from '@/lib/supabase/client'
 import { useRouter } from 'next/navigation'
 import type { UserRole } from '@/lib/redux/slices/authSlice'
@@ -29,7 +29,15 @@ export function useAuth() {
                 .single()
 
             const userRole: UserRole = profile?.role || 'user'
-            dispatch(setUser({ user: data.user, role: userRole }))
+            // supabase returns a session containing access_token
+            const accessToken = data.session?.access_token || ''
+            dispatch(
+                setCredentials({
+                    user: data.user,
+                    role: userRole,
+                    accessToken,
+                })
+            )
         }
 
         return data
@@ -37,7 +45,7 @@ export function useAuth() {
 
     const logout = async () => {
         await supabase.auth.signOut()
-        dispatch(clearUser())
+        dispatch(clearAuthState())
         router.push('/')
         router.refresh()
     }

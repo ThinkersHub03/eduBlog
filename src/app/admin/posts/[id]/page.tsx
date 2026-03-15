@@ -3,21 +3,22 @@
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card"
-import { TiptapEditor } from "@/components/tiptap-editor"
 import { createClient } from "@/lib/supabase/client"
+import { Post } from '@/lib/types/post'
 import { useState, useEffect } from "react"
 import { useRouter, useParams } from "next/navigation"
 import { FileUpload } from "@/components/file-upload"
 import { Switch } from "@/components/ui/switch"
 import { ArrowLeft, FileEdit, Sparkles, Globe, Image as ImageIcon, Layout } from "lucide-react"
 import Link from "next/link"
+import { BlockEditor, PostBlock } from "@/components/block-editor"
 
 export default function EditPostPage() {
     const { id } = useParams()
     const [loading, setLoading] = useState(false)
     const [fetching, setFetching] = useState(true)
-    const [post, setPost] = useState<any>(null)
-    const [content, setContent] = useState('')
+    const [post, setPost] = useState<Post | null>(null)
+    const [blocks, setBlocks] = useState<PostBlock[]>([])
     const [imageUrl, setImageUrl] = useState('')
     const [published, setPublished] = useState(false)
 
@@ -32,7 +33,7 @@ export default function EditPostPage() {
                 router.push('/admin/posts')
             } else if (data) {
                 setPost(data)
-                setContent(data.content)
+                setBlocks(data.content || [])
                 setImageUrl(data.featured_image)
                 setPublished(data.published)
             }
@@ -46,22 +47,33 @@ export default function EditPostPage() {
         setLoading(true)
         const formData = new FormData(e.currentTarget)
 
-        const data = {
+        const payload = {
             title: formData.get('title') as string,
             slug: formData.get('slug') as string,
-            content: content,
+            content: blocks,
             featured_image: imageUrl,
-            published: published
+            published: published,
         }
 
-        const { error } = await supabase.from('posts').update(data).eq('id', id)
-
-        if (error) {
-            alert(error.message)
-        } else {
-            router.push('/admin/posts')
-            router.refresh()
+        try {
+            const res = await fetch(`/api/posts/${id}`, {
+                method: 'PUT',
+                headers: { 'Content-Type': 'application/json' },
+                credentials: 'include',
+                body: JSON.stringify(payload),
+            })
+            const json = await res.json()
+            if (!json.success) {
+                alert(json.error || 'Update failed')
+            } else {
+                router.push('/admin/posts')
+                router.refresh()
+            }
+        } catch (err) {
+            console.error(err)
+            alert('Network error')
         }
+
         setLoading(false)
     }
 
@@ -136,7 +148,7 @@ export default function EditPostPage() {
                                 Article Body
                             </label>
                             <div className="p-1 rounded-3xl border border-gray-100 bg-gray-50/30 overflow-hidden min-h-[400px]">
-                                <TiptapEditor content={content} onChange={setContent} />
+                                <BlockEditor blocks={blocks} onChange={setBlocks} />
                             </div>
                         </div>
 

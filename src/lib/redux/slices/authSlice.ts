@@ -6,6 +6,7 @@ export type UserRole = 'user' | 'admin'
 interface AuthState {
     user: User | null
     role: UserRole | null
+    accessToken: string | null
     isAuthenticated: boolean
     loading: boolean
 }
@@ -13,6 +14,7 @@ interface AuthState {
 const initialState: AuthState = {
     user: null,
     role: null,
+    accessToken: null,
     isAuthenticated: false,
     loading: true,
 }
@@ -21,15 +23,24 @@ export const authSlice = createSlice({
     name: 'auth',
     initialState,
     reducers: {
-        setUser: (state, action: PayloadAction<{ user: User; role: UserRole }>) => {
+        // called after successful login/refresh; sets user and token
+        setCredentials: (
+            state,
+            action: PayloadAction<{ user: User; role: UserRole; accessToken: string }>
+        ) => {
             state.user = action.payload.user
             state.role = action.payload.role
+            state.accessToken = action.payload.accessToken
             state.isAuthenticated = true
             state.loading = false
         },
-        clearUser: (state) => {
+        updateAccessToken: (state, action: PayloadAction<string>) => {
+            state.accessToken = action.payload
+        },
+        logout: (state) => {
             state.user = null
             state.role = null
+            state.accessToken = null
             state.isAuthenticated = false
             state.loading = false
         },
@@ -39,5 +50,10 @@ export const authSlice = createSlice({
     },
 })
 
-export const { setUser, clearUser, setLoading } = authSlice.actions
+export const {
+    setCredentials,
+    updateAccessToken,
+    logout,
+    setLoading,
+} = authSlice.actions
 export default authSlice.reducer

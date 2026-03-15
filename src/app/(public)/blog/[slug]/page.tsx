@@ -5,21 +5,37 @@ import { Button } from "@/components/ui/button"
 import Link from "next/link"
 import { ArrowLeft } from "lucide-react"
 
-export async function generateMetadata({ params }: { params: { slug: string } }) {
+export async function generateMetadata({ params }: { params: { slug: string } | Promise<{ slug: string }> }) {
+    const { slug } = await params
     const supabase = await createClient()
-    const { data: post } = await supabase.from('posts').select('title').eq('slug', params.slug).single()
+    const { data: post } = await supabase.from('posts').select('title, content, featured_image').eq('slug', slug).single()
+
+    if (!post) {
+        return { title: 'Post Not Found' }
+    }
+
+    let description = ''
+    if (Array.isArray(post.content)) {
+        const p = post.content.find((b: any) => b.type === 'paragraph')
+        if (p) description = p.data.text
+    }
 
     return {
-        title: post?.title || 'Post Not Found',
+        title: post.title,
+        description,
+        openGraph: {
+            images: post.featured_image ? [{ url: post.featured_image }] : undefined,
+        },
     }
 }
 
-export default async function BlogPostPage({ params }: { params: { slug: string } }) {
+export default async function BlogPostPage({ params }: { params: { slug: string } | Promise<{ slug: string }> }) {
+    const { slug } = await params
     const supabase = await createClient()
     const { data: post } = await supabase
         .from('posts')
         .select('*')
-        .eq('slug', params.slug)
+        .eq('slug', slug)
         .single()
 
     if (!post) {
@@ -61,15 +77,39 @@ export default async function BlogPostPage({ params }: { params: { slug: string 
                 </div>
             )}
 
-            <div
-                className="prose prose-lg prose-blue max-w-none 
+            <div className="prose prose-lg prose-blue max-w-none 
                 prose-headings:font-bold prose-headings:text-gray-900 
                 prose-p:text-gray-600 prose-p:leading-relaxed
                 prose-a:text-primary-600 hover:prose-a:text-primary-700
                 prose-img:rounded-xl prose-img:shadow-md
-                bg-white p-8 md:p-12 rounded-2xl shadow-sm border border-gray-100"
-                dangerouslySetInnerHTML={{ __html: post.content }}
-            />
+                bg-white p-8 md:p-12 rounded-2xl shadow-sm border border-gray-100">
+                {Array.isArray(post.content) && post.content.map((block: any) => {
+                    switch (block.type) {
+                        case 'heading':
+                            const Tag = `h${block.data.level}` as keyof JSX.IntrinsicElements
+                            return <Tag key={block.id} className="font-bold mt-8">{block.data.text}</Tag>
+                        case 'paragraph':
+                            return <p key={block.id} dangerouslySetInnerHTML={{ __html: block.data.text }} />
+                        case 'image':
+                            return (
+                                <figure key={block.id} className="my-8">
+                                    <img src={block.data.url} alt={block.data.caption || ''} className="w-full" />
+                                    {block.data.caption && <figcaption className="text-sm text-gray-500">{block.data.caption}</figcaption>}
+                                </figure>
+                            )
+                        case 'file':
+                            return (
+                                <p key={block.id} className="my-4">
+                                    <a href={block.data.url} className="underline text-primary-600" target="_blank" rel="noopener noreferrer">
+                                        {block.data.name || 'Download file'}
+                                    </a>
+                                </p>
+                            )
+                        default:
+                            return null
+                    }
+                })}
+            </div>
         </article>
     )
 }

@@ -20,6 +20,7 @@ export default function DashboardDropdown() {
     }, [])
 
     const adminLinks = [
+        { href: '/admin/posts', label: 'Manage Blog Posts', icon: FileText },
         { href: '/admin/books', label: 'Manage Books', icon: BookOpen },
         { href: '/admin/pastpapers', label: 'Manage Past Papers', icon: FileText },
         { href: '/admin/institutions', label: 'Manage Institutions', icon: GraduationCap },

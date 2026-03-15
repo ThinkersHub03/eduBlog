@@ -23,11 +23,19 @@ export function AdminDeleteButton({ table, id, path, title }: DeleteButtonProps)
     const handleConfirm = () => {
         setError(null)
         startTransition(async () => {
-            const result = table === 'books'
-                ? await deleteBook(id, path)
-                : await deleteRecord(table, id, path)
+            let result: any
+            if (table === 'posts') {
+                // call REST API which handles associated storage cleanup
+                const res = await fetch(`/api/posts/${id}`, { method: 'DELETE', credentials: 'include' })
+                const json = await res.json()
+                result = json
+            } else if (table === 'books') {
+                result = await deleteBook(id, path)
+            } else {
+                result = await deleteRecord(table, id, path)
+            }
 
-            if ('error' in result && result.error) {
+            if (result?.error) {
                 setError(result.error)
             } else {
                 setOpen(false)

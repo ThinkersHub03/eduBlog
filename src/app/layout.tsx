@@ -1,7 +1,7 @@
 import type { Metadata } from "next";
 import { Inter } from "next/font/google";
 import "./globals.css";
-import { Navbar } from "@/components/layout/navbar";
+import { Header } from "@/components/layout/Header";
 import { Footer } from "@/components/layout/footer";
 import { BottomNav } from "@/components/layout/bottom-nav";
 import { LayoutWrapper } from "@/components/layout/layout-wrapper";
@@ -36,12 +36,12 @@ export default function RootLayout({
 }>) {
     return (
         <html lang="en">
-            <body className={`${inter.variable} min-h-screen bg-gray-50 font-sans antialiased flex flex-col`}>
+            <body className={`${inter.variable} min-h-screen bg-white font-sans antialiased flex flex-col`}>
                 <ReduxProvider>
                     <AuthProvider>
-                        <Navbar />
+                        <Header />
                         <LayoutWrapper>
-                            <main className="flex-1 pb-20 md:pb-0">
+                            <main className="flex-1 pb-20 bg-white">
                                 {children}
                             </main>
                             <Footer />

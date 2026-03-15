@@ -1,6 +1,7 @@
 import Link from "next/link"
 import { Button } from "@/components/ui/button"
 import { createClient } from "@/lib/supabase/server"
+import { Post } from '@/lib/types/post'
 import {
     Table,
     TableBody,
@@ -16,6 +17,7 @@ import { AdminDeleteButton } from "@/components/admin-delete-button"
 export default async function AdminPostsPage() {
     const supabase = await createClient()
     const { data: posts } = await supabase.from('posts').select('*').order('created_at', { ascending: false })
+    // posts will be Post[] or null
 
     return (
         <div className="space-y-8 py-6">

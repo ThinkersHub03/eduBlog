@@ -2,12 +2,13 @@ import { createClient } from "@/lib/supabase/server"
 import { notFound } from "next/navigation"
 import { MapPin, Building2, Calendar } from "lucide-react"
 
-export default async function InstitutionPage({ params }: { params: { id: string } }) {
+export default async function InstitutionPage({ params }: { params: { id: string } | Promise<{ id: string }> }) {
+    const { id } = await params
     const supabase = await createClient()
     const { data: institution } = await supabase
         .from('institutions')
         .select('*')
-        .eq('id', params.id)
+        .eq('id', id)
         .single()
 
     if (!institution) {

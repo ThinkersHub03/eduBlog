@@ -8,6 +8,9 @@ export function slugSegment(value: string) {
         .replace(/^-+|-+$/g, '') || 'general'
 }
 
+// alias for clarity; works identical to slugSegment
+export const slugify = slugSegment
+
 export function sanitizePdfFileName(fileName: string) {
     const base = fileName.replace(/\.pdf$/i, '')
     const cleaned = base

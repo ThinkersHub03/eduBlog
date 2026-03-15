@@ -10,13 +10,15 @@ export const metadata: Metadata = {
     description: "Educational news, career insights, and campus updates.",
 }
 
-export default async function BlogPage() {
-    const supabase = await createClient()
-    const { data: posts } = await supabase
-        .from('posts')
-        .select('*')
-        .eq('published', true)
-        .order('created_at', { ascending: false })
+export default async function BlogPage({ searchParams }: { searchParams?: Promise<{ page?: string; limit?: string }> }) {
+    const params = await searchParams
+    const page = parseInt(params?.page || '1', 10)
+    const limit = parseInt(params?.limit || '10', 10)
+
+    const baseUrl = process.env.NEXT_PUBLIC_SITE_URL || 'http://localhost:3000'
+    const res = await fetch(`${baseUrl}/api/posts?page=${page}&limit=${limit}`, { cache: 'no-store' })
+    const json = await res.json()
+    const posts = json.success ? json.data.posts : []
 
     return (
         <div className="container mx-auto px-4 py-10 space-y-12">
@@ -61,19 +63,26 @@ export default async function BlogPage() {
 
             {/* Blog Grid */}
             <div className="grid gap-8 md:grid-cols-2 lg:grid-cols-3">
-                {posts?.map((post) => (
-                    <ListingCard
-                        key={post.id}
-                        title={post.title}
-                        subtitle={new Date(post.created_at).toLocaleDateString(undefined, { dateStyle: 'long' })}
-                        type="Article"
-                        href={`/blog/${post.slug}`}
-                        actionLabel="Read Full Story"
-                        imageSrc={post.featured_image || 'https://images.unsplash.com/photo-1454165833767-027508493b69?q=80&w=2070&auto=format&fit=crop'}
-                        className="h-full border-b-4 border-b-primary-500/0 hover:border-b-primary-500 transition-all hover:bg-white hover:shadow-premium"
-                        meta="5 min read"
-                    />
-                ))}
+                {posts?.map((post) => {
+                    let excerpt = ''
+                    if (Array.isArray(post.content)) {
+                        const p = post.content.find((b: any) => b.type === 'paragraph')
+                        if (p) excerpt = p.data.text.slice(0, 140) + (p.data.text.length > 140 ? '…' : '')
+                    }
+                    return (
+                        <ListingCard
+                            key={post.id}
+                            title={post.title}
+                            subtitle={excerpt || new Date(post.created_at).toLocaleDateString(undefined, { dateStyle: 'long' })}
+                            type="Article"
+                            href={`/blog/${post.slug}`}
+                            actionLabel="Read Full Story"
+                            imageSrc={post.featured_image || 'https://images.unsplash.com/photo-1454165833767-027508493b69?q=80&w=2070&auto=format&fit=crop'}
+                            className="h-full border-b-4 border-b-primary-500/0 hover:border-b-primary-500 transition-all hover:bg-white hover:shadow-premium"
+                            meta="5 min read"
+                        />
+                    )
+                })}
                 {!posts?.length && (
                     <div className="col-span-full py-24 text-center bg-white rounded-3xl border-2 border-dashed border-gray-100">
                         <Globe className="h-16 w-16 text-gray-200 mx-auto mb-4" />
@@ -83,6 +92,16 @@ export default async function BlogPage() {
                             Refresh Feed
                         </Button>
                     </div>
+                )}
+            </div>
+
+            {/* pagination controls */}
+            <div className="flex justify-center items-center gap-4 mt-12">
+                {page > 1 && (
+                    <a href={`/blog?page=${page - 1}&limit=${limit}`} className="px-4 py-2 bg-gray-100 rounded-lg">Previous</a>
+                )}
+                {posts.length === limit && (
+                    <a href={`/blog?page=${page + 1}&limit=${limit}`} className="px-4 py-2 bg-gray-100 rounded-lg">Next</a>
                 )}
             </div>
 

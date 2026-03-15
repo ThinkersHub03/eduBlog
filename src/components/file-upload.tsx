@@ -7,10 +7,18 @@ import { Input } from '@/components/ui/input'
 
 interface FileUploadProps {
     onUpload: (url: string) => void
+    /**
+     * folder inside the bucket; e.g. "images" or "files". The full path
+     * that will be uploaded to is `${folder}/${random}.${ext}`.
+     */
     folder?: string
+    /**
+     * name of the storage bucket (defaults to 'blog').
+     */
+    bucket?: string
 }
 
-export function FileUpload({ onUpload, folder = 'uploads' }: FileUploadProps) {
+export function FileUpload({ onUpload, folder = 'uploads', bucket = 'blogs' }: FileUploadProps) {
     const [uploading, setUploading] = useState(false)
     const supabase = createClient()
 
@@ -19,7 +27,7 @@ export function FileUpload({ onUpload, folder = 'uploads' }: FileUploadProps) {
             setUploading(true)
 
             if (!e.target.files || e.target.files.length === 0) {
-                throw new Error('You must select an image to upload.')
+                throw new Error('You must select a file to upload.')
             }
 
             const file = e.target.files[0]
@@ -28,14 +36,14 @@ export function FileUpload({ onUpload, folder = 'uploads' }: FileUploadProps) {
             const filePath = `${folder}/${fileName}`
 
             const { error: uploadError } = await supabase.storage
-                .from('files')
+                .from(bucket)
                 .upload(filePath, file)
 
             if (uploadError) {
                 throw uploadError
             }
 
-            const { data } = supabase.storage.from('files').getPublicUrl(filePath)
+            const { data } = supabase.storage.from(bucket).getPublicUrl(filePath)
 
             onUpload(data.publicUrl)
         } catch (error) {

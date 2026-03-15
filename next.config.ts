@@ -1,6 +1,9 @@
 import type { NextConfig } from "next";
 
 const nextConfig: NextConfig = {
+  images: {
+    domains: ['jeryjcdwkagmbbpcwymp.supabase.co'],
+  },
   async redirects() {
     return [
       { source: "/exams", destination: "/pastpapers", permanent: true },

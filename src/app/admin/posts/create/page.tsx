@@ -3,48 +3,60 @@
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
-import { TiptapEditor } from "@/components/tiptap-editor"
 import { createClient } from "@/lib/supabase/client"
+import { slugify } from '@/lib/pastpapers'
 import { useState } from "react"
 import { useRouter } from "next/navigation"
 import { FileUpload } from "@/components/file-upload"
+import { BlockEditor, PostBlock } from "@/components/block-editor"
 
 export default function CreatePostPage() {
     const [loading, setLoading] = useState(false)
-    const [content, setContent] = useState('')
+    const [blocks, setBlocks] = useState<PostBlock[]>([])
     const [imageUrl, setImageUrl] = useState('')
     const router = useRouter()
-    const supabase = createClient()
 
-    const generateSlug = (title: string) => {
-        return title.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/(^-|-$)/g, '')
-    }
+    const generateSlug = (title: string) => slugify(title)
 
     const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
         e.preventDefault()
         setLoading(true)
         const formData = new FormData(e.currentTarget)
         const title = formData.get('title') as string
+        let slug = (formData.get('slug') as string) || generateSlug(title)
 
-        // Auto-generate slug if not provided/modified (simplified logic here)
-        const slug = generateSlug(title) + '-' + Date.now().toString().slice(-4)
+        // attach timestamp to guarantee uniqueness when auto-generated
+        if (!formData.get('slug')) {
+            slug = `${slug}-${Date.now().toString().slice(-4)}`
+        }
 
-        const data = {
+        const payload = {
             title,
             slug,
-            content: content,
-            featured_image: imageUrl,
-            published: true // Default to published for now
+            content: blocks,
+            featured_image: imageUrl || null,
+            published: true,
         }
 
-        const { error } = await supabase.from('posts').insert(data)
-
-        if (error) {
-            alert(error.message)
-        } else {
-            router.push('/admin/posts')
-            router.refresh()
+        try {
+            const res = await fetch('/api/posts', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                credentials: 'include',
+                body: JSON.stringify(payload),
+            })
+            const json = await res.json()
+            if (!json.success) {
+                alert(json.error || 'An error occurred')
+            } else {
+                router.push('/admin/posts')
+                router.refresh()
+            }
+        } catch (err) {
+            console.error(err)
+            alert('Network error creating post')
         }
+
         setLoading(false)
     }
 
@@ -62,14 +74,19 @@ export default function CreatePostPage() {
                         </div>
 
                         <div className="grid gap-2">
+                            <label htmlFor="slug" className="text-sm font-medium">Slug (optional)</label>
+                            <Input id="slug" name="slug" placeholder="Leave blank to auto-generate" />
+                        </div>
+
+                        <div className="grid gap-2">
                             <label className="text-sm font-medium">Featured Image</label>
-                            <FileUpload onUpload={setImageUrl} folder="blog-images" />
+                            <FileUpload onUpload={setImageUrl} folder="images" bucket="blogs" />
                             {imageUrl && <img src={imageUrl} alt="Preview" className="h-40 w-full object-cover rounded-md" />}
                         </div>
 
                         <div className="grid gap-2">
                             <label className="text-sm font-medium">Content</label>
-                            <TiptapEditor content={content} onChange={setContent} />
+                            <BlockEditor blocks={blocks} onChange={setBlocks} />
                         </div>
 
                         <div className="flex justify-end gap-2">
