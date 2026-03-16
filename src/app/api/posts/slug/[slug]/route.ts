@@ -5,12 +5,18 @@ function json(data: any, status = 200) {
     return NextResponse.json(data, { status })
 }
 
-export async function GET(request: NextRequest, { params }: { params: { slug: string } }) {
+export async function GET(
+    request: NextRequest,
+    context: { params: Promise<{ slug: string }> }
+) {
+    const { slug } = await context.params
+
     const supabase = await createClient()
+
     const { data: post, error } = await supabase
         .from('posts')
         .select('*')
-        .eq('slug', params.slug)
+        .eq('slug', slug)
         .eq('published', true)
         .single()
 

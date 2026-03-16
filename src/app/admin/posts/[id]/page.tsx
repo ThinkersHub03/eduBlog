@@ -4,20 +4,20 @@ import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card"
 import { createClient } from "@/lib/supabase/client"
-import { Post } from '@/lib/types/post'
+import { Post, PostBlock } from '@/lib/types/post'
 import { useState, useEffect } from "react"
 import { useRouter, useParams } from "next/navigation"
 import { FileUpload } from "@/components/file-upload"
 import { Switch } from "@/components/ui/switch"
 import { ArrowLeft, FileEdit, Sparkles, Globe, Image as ImageIcon, Layout } from "lucide-react"
 import Link from "next/link"
-import { BlockEditor, PostBlock } from "@/components/block-editor"
+import { BlockEditor} from "@/components/block-editor"
 
 export default function EditPostPage() {
     const { id } = useParams()
     const [loading, setLoading] = useState(false)
     const [fetching, setFetching] = useState(true)
-    const [post, setPost] = useState<Post | null>(null)
+    const [post, setPost] = useState<Post | any>(null)
     const [blocks, setBlocks] = useState<PostBlock[]>([])
     const [imageUrl, setImageUrl] = useState('')
     const [published, setPublished] = useState(false)

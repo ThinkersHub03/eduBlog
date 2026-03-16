@@ -36,12 +36,12 @@ apiClient.interceptors.request.use(
         }
         return config
     },
-    (error) => Promise.reject(error)
+    (error:any) => Promise.reject(error)
 )
 
 // response interceptor to handle 401
 apiClient.interceptors.response.use(
-    (res) => res,
+    (res:any) => res,
     async (err: AxiosError) => {
         const originalRequest = err.config as InternalAxiosRequestConfig & { _retry?: boolean }
         if (

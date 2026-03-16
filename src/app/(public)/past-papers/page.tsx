@@ -5,6 +5,8 @@ import { Button } from "@/components/ui/button"
 import { ListingCard } from "@/components/ui/listing-card"
 import { Search } from "lucide-react"
 import { getPastPapersFilterOptions, normalizeQueryParam } from "@/lib/pastpapers-search"
+import InfoSection from "@/components/InfoSection"
+import DataInfoSection from "@/components/DataInfoSection"
 
 export const metadata: Metadata = {
     title: "Past Papers | EduPortal",
@@ -145,9 +147,10 @@ export default async function PastPapersPage({ searchParams }: { searchParams: P
                     {(data || []).map((item:any) => (
                         <div
                             key={item.id}
-                            className=" bg-white border border-gray-200 flex-wrap w-full sm:w-auto sm:flex-row flex-col   rounded-xl shadow-sm overflow-hidden flex  items-center p-2 hover:shadow-lg transition-shadow duration-200"
+                            className=" bg-white border border-gray-200 flex-wrap w-full sm:w-auto sm:flex-row flex-col   rounded-xl shadow-sm overflow-hidden flex  items-center p-2 hover:shadow-lg transition-shadow duration-200 cursor-pointer relative"
                         >
-                            <div className="w-[220px] h-[110px] shrink-0 flex items-center justify-center bg-gray-100 rounded-md overflow-hidden! ">
+                              <a href={`/past-papers/${item.id}`} className="absolute inset-0 z-10 w-full h-full " ></a>
+                            <div className="w-55 h-27.5 shrink-0 flex items-center justify-center bg-gray-100 rounded-md overflow-hidden ">
                                 {item.file_url ? (
                                     <embed
                                         src={item.file_url}
@@ -178,6 +181,11 @@ export default async function PastPapersPage({ searchParams }: { searchParams: P
                     )}
                 </div>
             )}
+
+                        {/* Introductory Info Section */}
+            <InfoSection />
+            {/* Data Details Section */}
+            <DataInfoSection />
         </div>
     )
 }

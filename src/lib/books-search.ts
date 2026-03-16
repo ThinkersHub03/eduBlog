@@ -4,9 +4,9 @@
 export type FilterOption = { value: string; label: string }
 
 /**
- * Defines the possible filters for past papers search.
+ * Defines the possible filters for books search.
  */
-export type PastPapersFilters = {
+export type BooksFilters = {
     board?: string
     class_level?: string
     subject?: string
@@ -71,14 +71,14 @@ function toOptions(values: string[]): FilterOption[] {
 }
 
 /**
- * Retrieves distinct values for a specific column from the past_papers table.
+ * Retrieves distinct values for a specific column from the books table.
  * @param supabase - The Supabase client instance.
  * @param column - The column name to retrieve distinct values for.
  * @returns Promise resolving to an array of distinct string values.
  */
 async function getDistinctValues(supabase: SupabaseClientLike, column: string): Promise<string[]> {
     const { data, error } = await supabase
-        .from('past_papers')
+        .from('books')
         .select(column)
         .order(column)
 
@@ -97,12 +97,12 @@ async function getDistinctValues(supabase: SupabaseClientLike, column: string): 
 }
 
 /**
- * Fetches filter options for past papers (boards, class levels, subjects).
+ * Fetches filter options for books (boards, class levels, subjects).
  * Uses distinct queries to ensure all unique values are retrieved without limits.
  * @param supabase - The Supabase client instance.
  * @returns Promise resolving to an object with arrays of filter options.
  */
-export async function getPastPapersFilterOptions(
+export async function getBooksFilterOptions(
     supabase: SupabaseClientLike
 ): Promise<{
     boards: FilterOption[]

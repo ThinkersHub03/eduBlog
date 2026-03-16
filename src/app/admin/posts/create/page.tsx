@@ -8,7 +8,8 @@ import { slugify } from '@/lib/pastpapers'
 import { useState } from "react"
 import { useRouter } from "next/navigation"
 import { FileUpload } from "@/components/file-upload"
-import { BlockEditor, PostBlock } from "@/components/block-editor"
+import { BlockEditor } from "@/components/block-editor"
+import { PostBlock } from "@/lib/types/post"
 
 export default function CreatePostPage() {
     const [loading, setLoading] = useState(false)

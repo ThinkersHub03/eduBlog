@@ -63,7 +63,7 @@ export default async function BlogPage({ searchParams }: { searchParams?: Promis
 
             {/* Blog Grid */}
             <div className="grid gap-8 md:grid-cols-2 lg:grid-cols-3">
-                {posts?.map((post) => {
+                {posts?.map((post:any) => {
                     let excerpt = ''
                     if (Array.isArray(post.content)) {
                         const p = post.content.find((b: any) => b.type === 'paragraph')

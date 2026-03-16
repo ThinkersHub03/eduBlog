@@ -4,6 +4,7 @@ import { Calendar, Clock, User } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import Link from "next/link"
 import { ArrowLeft } from "lucide-react"
+import React from "react"
 
 export async function generateMetadata({ params }: { params: { slug: string } | Promise<{ slug: string }> }) {
     const { slug } = await params
@@ -86,7 +87,7 @@ export default async function BlogPostPage({ params }: { params: { slug: string 
                 {Array.isArray(post.content) && post.content.map((block: any) => {
                     switch (block.type) {
                         case 'heading':
-                            const Tag = `h${block.data.level}` as keyof JSX.IntrinsicElements
+                            const Tag = `h${block.data.level}` as keyof React.JSX.IntrinsicElements
                             return <Tag key={block.id} className="font-bold mt-8">{block.data.text}</Tag>
                         case 'paragraph':
                             return <p key={block.id} dangerouslySetInnerHTML={{ __html: block.data.text }} />

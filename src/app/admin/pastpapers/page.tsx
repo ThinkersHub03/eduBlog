@@ -76,16 +76,6 @@ export default async function AdminPastPapersPage({ searchParams }: { searchPara
                 </Link>
             </div>
 
-            <form className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-3">
-                <div className="relative sm:col-span-2">
-                    <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-gray-400" />
-                    <Input name="q" defaultValue={q} placeholder="Search subject, board or class..." className="pl-9 h-11" />
-                </div>
-                <Input name="board" defaultValue={board} placeholder="Board" className="h-11" />
-                <Input name="class_level" defaultValue={classLevel} placeholder="Class level" className="h-11" />
-                <Input name="year" defaultValue={year} placeholder="Year" className="h-11" inputMode="numeric" />
-                <Button type="submit" className="h-11 lg:col-start-5">Apply Filters</Button>
-            </form>
 
             {error ? (
                 <div className="rounded-2xl border border-red-200 bg-red-50 p-4">

@@ -17,14 +17,10 @@ export function Footer() {
     ]
 
     const infoLinks = [
-        { label: "About Us", href: "/about" },
-        { label: "Privacy Policy", href: "/privacy" },
-        { label: "Terms & Condition", href: "/terms" },
-        { label: "FAQs", href: "/faqs" },
-        { label: "Copyrights & Thanks", href: "/copyright" },
-        { label: "Advertise With Us", href: "/advertise" },
-        { label: "Android App", href: "/android-app" },
-        { label: "Account & Data Deletion", href: "/account-deletion" },
+        { label: "About", href: "/about-us" },
+        { label: "Contact", href: "/contact-us" },
+        { label: "Privacy Policy", href: "/privacy-policy" },
+        { label: "Copyright", href: "/copyright" },
     ]
 
     return (
